@@ -1,7 +1,5 @@
 import unittest
-
-def is_strong_password(pwd):
-    return False  # minimal implementation so tests compile
+from password import is_strong_password
 
 class TestIsStrongPassword(unittest.TestCase):
     def test_short_password(self):
