@@ -65,7 +65,40 @@ class TestWeatherProcessor(unittest.TestCase):
         message = processor.get_rain_forecast("Cape Town", hour=15)
         self.assertIn("very low chance of rain", message)
 
-    
+    def test_rain_forecast_invalid_probabilities_none(self):
+        self.mock_fetcher.get_chance_of_rain.return_value = None
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        # We expect an exception, but the current implementation does not raise
+        with self.assertRaises(Exception):
+            processor.get_rain_forecast("NoDataCity", hour=9)
+
+    def test_rain_forecast_invalid_probabilities_length(self):
+        # Too few probabilities
+        self.mock_fetcher.get_chance_of_rain.return_value = [0.1, 0.2, 0.3]
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(Exception):
+            processor.get_rain_forecast("InvalidLengthProb", hour=9)
+
+    def test_rain_forecast_invalid_hour_type(self):
+        self.mock_fetcher.get_chance_of_rain.return_value = [0.1] * 8
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        # Pass non-integer hour
+        with self.assertRaises(Exception):
+            processor.get_rain_forecast("BadHourCity", hour="noon")
+
+    def test_rain_forecast_probabilities_with_invalid_value(self):
+        # Probability out of range (>1)
+        self.mock_fetcher.get_chance_of_rain.return_value = [0.1, 0.5, 1.2, 0.8, 0.2, 0.1, 0.05, 0.03]
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(Exception):
+            processor.get_rain_forecast("BadProbCity", hour=6)
+
+    def test_rain_forecast_negative_or_too_large_probabilities(self):
+        # Probabilities contain a negative and a value greater than 1
+        self.mock_fetcher.get_chance_of_rain.return_value = [-0.2, 0.5, 1.1, 0.3, 0.4, 0.7, 0.6, 0.5]
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(Exception):
+            processor.get_rain_forecast("OutOfBoundProbCity", hour=3)
 # - Use unittest.mock.MagicMock or unittest.mock.patch to replace WeatherFetcher with a mock.
 # - Set the return_value of get_current_temperature for different test scenarios.
 # - Set the return_value of get_chance_of_rain for rain forecast scenarios.
