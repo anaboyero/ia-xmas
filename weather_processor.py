@@ -4,6 +4,13 @@ class WeatherProcessor:
     MODERATE_RAIN_PROBABILITY = 0.5
     LOW_RAIN_PROBABILITY = 0.2
 
+    def _validate_temperature(self, temp):
+        """Validates that temperature is a number and not None."""
+        if temp is None:
+            raise ValueError("Temperature cannot be None")
+        if not isinstance(temp, (int, float)):
+            raise TypeError("Temperature must be a number")
+
     def __init__(self, fetcher):
         self.fetcher = fetcher
         # Time slots: 0AM, 3AM, 6AM, 9AM, 12PM, 3PM, 6PM, 9PM

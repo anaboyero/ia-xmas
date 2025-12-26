@@ -99,7 +99,105 @@ class TestWeatherProcessor(unittest.TestCase):
         processor = self.WeatherProcessor(self.mock_fetcher)
         with self.assertRaises(Exception):
             processor.get_rain_forecast("OutOfBoundProbCity", hour=3)
-# - Use unittest.mock.MagicMock or unittest.mock.patch to replace WeatherFetcher with a mock.
+
+            
+    def test_validate_city_none(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(ValueError):
+            processor._validate_city(None)
+
+    def test_validate_city_not_string(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(TypeError):
+            processor._validate_city(1234)
+
+    def test_validate_city_empty_string(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(ValueError):
+            processor._validate_city("   ")
+
+    def test_validate_city_valid(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        # Should not raise
+        processor._validate_city("Tokyo")
+
+    def test_validate_hour_not_int(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(TypeError):
+            processor._validate_hour("noon")
+
+    def test_validate_hour_negative(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(ValueError):
+            processor._validate_hour(-1)
+
+    def test_validate_hour_too_large(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(ValueError):
+            processor._validate_hour(24)
+
+    def test_validate_hour_valid(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        for hour in [0, 12, 23]:
+            processor._validate_hour(hour)  # Should not raise
+
+    def test_validate_rain_probabilities_none(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(ValueError):
+            processor._validate_rain_probabilities(None)
+
+    def test_validate_rain_probabilities_not_list(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(TypeError):
+            processor._validate_rain_probabilities("bad")
+
+    def test_validate_rain_probabilities_wrong_length(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(ValueError):
+            processor._validate_rain_probabilities([0.1, 0.2])
+
+    def test_validate_rain_probabilities_invalid_type_in_list(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        # Replace one with a string
+        bad_probs = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, "not-a-float"]
+        with self.assertRaises(TypeError):
+            processor._validate_rain_probabilities(bad_probs)
+
+    def test_validate_rain_probabilities_value_too_low(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        probs = [0.1, 0.2, 0.3, -0.5, 0.5, 0.6, 0.7, 0.8]
+        with self.assertRaises(ValueError):
+            processor._validate_rain_probabilities(probs)
+
+    def test_validate_rain_probabilities_value_too_high(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        probs = [0.1, 0.2, 1.1, 0.4, 0.5, 0.6, 0.7, 0.8]
+        with self.assertRaises(ValueError):
+            processor._validate_rain_probabilities(probs)
+
+    def test_validate_rain_probabilities_valid(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        valid = [0.0, 0.15, 0.5, 0.7, 0.3, 0.6, 1.0, 0.25]
+        # Should not raise
+        processor._validate_rain_probabilities(valid)
+
+    def test_validate_temperature_none(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        # None should not raise
+        processor._validate_temperature(None)  # Should not raise
+
+    def test_validate_temperature_int(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        processor._validate_temperature(21)  # Should not raise
+
+    def test_validate_temperature_float(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        processor._validate_temperature(21.5)  # Should not raise
+
+    def test_validate_temperature_invalid_type(self):
+        processor = self.WeatherProcessor(self.mock_fetcher)
+        with self.assertRaises(TypeError):
+            processor._validate_temperature("warm")
 # - Set the return_value of get_current_temperature for different test scenarios.
 # - Set the return_value of get_chance_of_rain for rain forecast scenarios.
 
