@@ -15,30 +15,24 @@
 # Example improved code:
 MIN_LENGTH = 8
 SPECIAL_CHARS = "@#_!-?$%&()[]{}"
-
 def is_strong_password(pwd):
     """
-    Returns True if pwd meets the following criteria:
+    Returns a list of password rule violations. If the list is empty, the password is strong.
      - At least MIN_LENGTH characters
      - Contains at least one uppercase letter
      - Contains at least one lowercase letter
      - Contains at least one digit
      - Contains at least one special character from SPECIAL_CHARS
     """
+    errors = []
     if len(pwd) < MIN_LENGTH:
-        print(f"Password is too short. You need at least {MIN_LENGTH} characters")
-        return False
+        errors.append(f"Password is too short. You need at least {MIN_LENGTH} characters")
     if not any(c.isupper() for c in pwd):
-        print("Password does not contain an uppercase letter")
-        return False
+        errors.append("Password does not contain an uppercase letter")
     if not any(c.islower() for c in pwd):
-        print("Password does not contain a lowercase letter")
-        return False
+        errors.append("Password does not contain a lowercase letter")
     if not any(c.isdigit() for c in pwd):
-        print("Password does not contain a digit")
-        return False
+        errors.append("Password does not contain a digit")
     if not any(c in SPECIAL_CHARS for c in pwd):
-        print(f"Password does not contain a special character. You need to use at least one of the following characters: {SPECIAL_CHARS}")
-        return False
-    print("Well done!Password is strong")
-    return True
+        errors.append(f"Password does not contain a special character. You need to use at least one of the following characters: {SPECIAL_CHARS}")
+    return errors
