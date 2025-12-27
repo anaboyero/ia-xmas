@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import MagicMock
 from weather_processor import WeatherProcessor
+from datetime import time
+
 
 class TestWeatherProcessor(unittest.TestCase):
     def setUp(self):
@@ -8,8 +10,6 @@ class TestWeatherProcessor(unittest.TestCase):
         self.mock_fetcher = MagicMock()
         # Import or define WeatherProcessor in your project
         # For this example, let's define a minimal version here
-    
-
         self.WeatherProcessor = WeatherProcessor
 
     def test_freezing_temperature(self):
